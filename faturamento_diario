@@ -1,0 +1,63 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+using namespace std;
+
+int main() {
+    
+    ifstream file("faturamento.json");
+    if (!file.is_open()) {
+        cerr << "Erro ao abrir o arquivo de faturamento!" << endl;
+        return 1;
+    }
+
+    json dados;
+    file >> dados;
+    file.close();
+
+    vector<double> faturamento;
+    
+    
+    for (const auto& dia : dados) {
+        faturamento.push_back(dia["valor"]);
+    }
+
+    double menorFaturamento = -1;
+    double maiorFaturamento = -1;
+    double somaFaturamento = 0;
+    int diasComFaturamento = 0;
+
+    
+    for (double valor : faturamento) {
+        if (valor > 0) {
+            if (menorFaturamento == -1 || valor < menorFaturamento) {
+                menorFaturamento = valor;
+            }
+            if (maiorFaturamento == -1 || valor > maiorFaturamento) {
+                maiorFaturamento = valor;
+            }
+            somaFaturamento += valor;
+            diasComFaturamento++;
+        }
+    }
+
+    double mediaFaturamento = somaFaturamento / diasComFaturamento;
+
+    
+    int diasAcimaDaMedia = 0;
+    for (double valor : faturamento) {
+        if (valor > mediaFaturamento) {
+            diasAcimaDaMedia++;
+        }
+    }
+
+    
+    cout << "Menor valor de faturamento: " << menorFaturamento << endl;
+    cout << "Maior valor de faturamento: " << maiorFaturamento << endl;
+    cout << "Número de dias com faturamento acima da média: " << diasAcimaDaMedia << endl;
+
+    return 0;
+}
